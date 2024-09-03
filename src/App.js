@@ -76,50 +76,62 @@ function App() {
 
   const handleWineListPhotoChange = (event) => {
     const file = event.target.files[0];
-    setWineListPhoto(file);
-    setFileName(file ? file.name : '');
+    if (file) {
+      console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+      setWineListPhoto(file);
+      setFileName(file.name);
+    } else {
+      console.log('No file selected');
+      setWineListPhoto(null);
+      setFileName('');
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (wineListPhoto && dish) {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append('dish', dish);
-      formData.append('wineListPhoto', wineListPhoto);
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: formData,
-          credentials: 'include'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Raw API response:', JSON.stringify(data, null, 2));
-
-        if (!data.recommendations || !Array.isArray(data.recommendations)) {
-          throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
-        }
-
-        setRecommendation(data);
-        setSubmitted(true);
-      } catch (error) {
-        console.error('Submission failed:', error);
-        let errorMessage = `Failed to submit. Error: ${error.message}`;
-        if (error.message.includes('Invalid response format')) {
-          errorMessage += '\n\nThe server response did not contain the expected data structure. Please check the API endpoint and ensure it\'s returning the correct format.';
-        }
-        alert(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
+    if (!wineListPhoto || !dish) {
       alert('Please provide both the dish and the wine list photo.');
+      return;
+    }
+
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append('dish', dish);
+    formData.append('wineListPhoto', wineListPhoto);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+      }
+
+      const data = JSON.parse(responseText);
+      console.log('Parsed API response:', data);
+
+      if (!data.recommendations || !Array.isArray(data.recommendations)) {
+        throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
+      }
+
+      setRecommendation(data);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Submission failed:', error);
+      let errorMessage = `Failed to submit. Error: ${error.message}`;
+      if (error.message.includes('Invalid response format')) {
+        errorMessage += '\n\nThe server response did not contain the expected data structure. Please check the API endpoint and ensure it\'s returning the correct format.';
+      }
+      alert(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
