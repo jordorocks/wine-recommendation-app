@@ -51,6 +51,7 @@ function App() {
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Swirling the glass for inspiration');
+  const [fileName, setFileName] = useState('');
 
   useEffect(() => {
     if (isLoading) {
@@ -70,45 +71,48 @@ function App() {
   }, [isLoading]);
 
   const handleDishChange = (event) => {
-    setDish(event.target.value);
+    setDish(event.target.value.trim());
   };
 
   const handleWineListPhotoChange = (event) => {
-    setWineListPhoto(event.target.files[0]);
+    const file = event.target.files[0];
+    setWineListPhoto(file);
+    setFileName(file ? file.name : '');
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (wineListPhoto && dish) {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append('dish', dish);
-      formData.append('wineListPhoto', wineListPhoto);
-
-      try {
-        const response = await fetch(`${API_URL}`, {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log('Raw API response:', JSON.stringify(data, null, 2));
-        setRecommendation(data);
-        setSubmitted(true);
-      } catch (error) {
-        console.error('Submission failed:', error);
-        alert(`Failed to submit. Error: ${error.message}`);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
+    if (!wineListPhoto || !dish) {
       alert('Please provide both the dish and the wine list photo.');
+      return;
+    }
+
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append('dish', dish);
+    formData.append('wineListPhoto', wineListPhoto);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Raw API response:', JSON.stringify(data, null, 2));
+      setRecommendation(data);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert(`Failed to submit. Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,11 +125,13 @@ function App() {
   };
 
   const formatPrice = (price) => {
+    if (typeof price === 'number') {
+      return `$${price.toFixed(2)}`;
+    }
     if (typeof price === 'string') {
-      // Add dollar sign if it's missing
       return price.startsWith('$') ? price : `$${price}`;
     }
-    return price;
+    return 'Price not available';
   };
 
   return (
@@ -205,6 +211,11 @@ function App() {
                       onChange={handleWineListPhotoChange}
                     />
                   </Button>
+                  {fileName && (
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      Selected file: {fileName}
+                    </Typography>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -221,8 +232,9 @@ function App() {
                     color="primary"
                     onClick={handleSubmit}
                     fullWidth
+                    disabled={isLoading || !wineListPhoto || !dish}
                   >
-                    Get Wine Recommendation
+                    {isLoading ? 'Processing...' : 'Get Wine Recommendation'}
                   </Button>
                 </Grid>
               </Grid>
