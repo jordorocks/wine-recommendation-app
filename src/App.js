@@ -75,7 +75,8 @@ function App() {
     setWineListPhoto(event.target.files[0]);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     if (wineListPhoto && dish) {
       setIsLoading(true);
       const formData = new FormData();
@@ -83,18 +84,23 @@ function App() {
       formData.append('wineListPhoto', wineListPhoto);
 
       try {
-        const response = await fetch('http://localhost:5003/submit', {
+        const response = await fetch('/submit', {
           method: 'POST',
           body: formData,
         });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error}, details: ${errorData.details}`);
+        }
 
         const data = await response.json();
         console.log('Raw API response:', JSON.stringify(data, null, 2));
         setRecommendation(data);
         setSubmitted(true);
       } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to submit. Please try again.');
+        console.error('Submission failed:', error);
+        alert(`Failed to submit. Error: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
