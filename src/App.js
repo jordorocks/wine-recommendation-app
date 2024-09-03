@@ -42,6 +42,8 @@ const theme = createTheme({
   },
 });
 
+const API_URL = 'https://keen-malabi-73dd43.netlify.app/.netlify/functions/index';
+
 function App() {
   const [dish, setDish] = useState('');
   const [wineListPhoto, setWineListPhoto] = useState(null);
@@ -84,14 +86,15 @@ function App() {
       formData.append('wineListPhoto', wineListPhoto);
 
       try {
-        const response = await fetch('/.netlify/functions/index', {
+        const response = await fetch(`${API_URL}/submit`, {
           method: 'POST',
           body: formData,
         });
         
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error}, details: ${errorData.details}`);
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
         }
 
         const data = await response.json();
