@@ -89,6 +89,7 @@ function App() {
         });
 
         const data = await response.json();
+        console.log('Raw API response:', JSON.stringify(data, null, 2));
         setRecommendation(data);
         setSubmitted(true);
       } catch (error) {
