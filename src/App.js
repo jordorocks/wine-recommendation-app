@@ -95,12 +95,12 @@ function App() {
           credentials: 'include'
         });
         
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Raw API response:', JSON.stringify(data, null, 2));
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}, message: ${data.message || 'Unknown error'}`);
-        }
 
         if (!data.recommendations || !Array.isArray(data.recommendations)) {
           throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
