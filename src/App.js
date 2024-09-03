@@ -106,15 +106,11 @@ function App() {
         credentials: 'include'
       });
 
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = JSON.parse(responseText);
+      const data = await response.json();
       console.log('Parsed API response:', data);
 
       if (!data.recommendations || !Array.isArray(data.recommendations)) {
@@ -125,11 +121,7 @@ function App() {
       setSubmitted(true);
     } catch (error) {
       console.error('Submission failed:', error);
-      let errorMessage = `Failed to submit. Error: ${error.message}`;
-      if (error.message.includes('Invalid response format')) {
-        errorMessage += '\n\nThe server response did not contain the expected data structure. Please check the API endpoint and ensure it\'s returning the correct format.';
-      }
-      alert(errorMessage);
+      alert(`Failed to submit. Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -196,7 +188,7 @@ function App() {
                     {formatPrice(wine.price)}
                   </Typography>
                   <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {wine.description}
+                    {wine.pairing}
                   </Typography>
                 </Box>
               ))}
