@@ -84,7 +84,7 @@ function App() {
       formData.append('wineListPhoto', wineListPhoto);
 
       try {
-        const response = await fetch('/submit', {
+        const response = await fetch('/.netlify/functions/index', {
           method: 'POST',
           body: formData,
         });
