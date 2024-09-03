@@ -83,7 +83,7 @@ function App() {
       formData.append('wineListPhoto', wineListPhoto);
 
       try {
-        const response = await fetch('https://keen-malabi-73dd43.netlify.app/submit', {
+        const response = await fetch('https://keen-malabi-73dd43.netlify.app/.netlify/functions/index/submit', {
           method: 'POST',
           body: formData,
         });
