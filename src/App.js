@@ -82,38 +82,40 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!wineListPhoto || !dish) {
-      alert('Please provide both the dish and the wine list photo.');
-      return;
-    }
+    if (wineListPhoto && dish) {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('dish', dish);
+      formData.append('wineListPhoto', wineListPhoto);
 
-    setIsLoading(true);
-    const formData = new FormData();
-    formData.append('dish', dish);
-    formData.append('wineListPhoto', wineListPhoto);
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+        const data = await response.json();
+        console.log('Raw API response:', JSON.stringify(data, null, 2));
+        
+        if (!data.recommendations || !Array.isArray(data.recommendations)) {
+          throw new Error('Invalid response format');
+        }
+
+        setRecommendation(data);
+        setSubmitted(true);
+      } catch (error) {
+        console.error('Submission failed:', error);
+        alert(`Failed to submit. Error: ${error.message}`);
+      } finally {
+        setIsLoading(false);
       }
-
-      const data = await response.json();
-      console.log('Raw API response:', JSON.stringify(data, null, 2));
-      setRecommendation(data);
-      setSubmitted(true);
-    } catch (error) {
-      console.error('Submission failed:', error);
-      alert(`Failed to submit. Error: ${error.message}`);
-    } finally {
-      setIsLoading(false);
+    } else {
+      alert('Please provide both the dish and the wine list photo.');
     }
   };
 
@@ -169,7 +171,7 @@ function App() {
               <Typography variant="h6" gutterBottom>
                 Recommended Wines:
               </Typography>
-              {recommendation.recommendations.map((wine, index) => (
+              {recommendation && recommendation.recommendations && recommendation.recommendations.map((wine, index) => (
                 <Box key={index} sx={{ mb: 3 }}>
                   <Typography variant="subtitle1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {wine.name}
