@@ -42,7 +42,7 @@ const theme = createTheme({
   },
 });
 
-const API_URL = 'https://keen-malabi-73dd43.netlify.app/.netlify/functions/index';
+const API_URL = 'https://keen-malabi-73dd43.netlify.app/.netlify/functions/api';
 
 function App() {
   const [dish, setDish] = useState('');
@@ -96,6 +96,7 @@ function App() {
       const response = await fetch(API_URL, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
       
       if (!response.ok) {
