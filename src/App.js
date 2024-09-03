@@ -154,11 +154,13 @@ function App() {
               </Typography>
               {recommendation.recommendations.map((wine, index) => (
                 <Box key={index} sx={{ mb: 3 }}>
-                  <Typography variant="subtitle1">{wine.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="subtitle1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {wine.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {formatPrice(wine.price)}
                   </Typography>
-                  <Typography variant="body2" paragraph>
+                  <Typography variant="body2" paragraph sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {wine.description}
                   </Typography>
                 </Box>

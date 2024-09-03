@@ -94,6 +94,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   color: #333;
+  white-space: pre-wrap;  /* Add this line */
+  word-wrap: break-word;  /* Add this line */
 }
 
 .explanation, .recommended-wines, .conclusion {
@@ -111,6 +113,8 @@ body {
   background-color: #f8f8f8;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  white-space: pre-wrap;  /* Add this line */
+  word-wrap: break-word;  /* Add this line */
 }
 
 .wine-item h4 {
@@ -126,4 +130,6 @@ body {
 .wine-description {
   font-style: italic;
   color: #666;
+  white-space: pre-wrap;  /* Add this line */
+  word-wrap: break-word;  /* Add this line */
 }
