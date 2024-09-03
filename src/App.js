@@ -42,7 +42,7 @@ const theme = createTheme({
   },
 });
 
-const API_URL = 'https://keen-malabi-73dd43.netlify.app/.netlify/functions/index';
+const API_URL = 'https://keen-malabi-73dd43.netlify.app';
 
 function App() {
   const [dish, setDish] = useState('');
@@ -86,7 +86,7 @@ function App() {
       formData.append('wineListPhoto', wineListPhoto);
 
       try {
-        const response = await fetch(`${API_URL}/submit`, {
+        const response = await fetch(`${API_URL}/.netlify/functions/index/submit`, {
           method: 'POST',
           body: formData,
         });
